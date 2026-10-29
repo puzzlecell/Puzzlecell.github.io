@@ -1,0 +1,31 @@
+PuzzleCell Firebase Sign-In & Cloud Saving — Setup Guide
+=====================================================
+
+Files
+-----
+1. PuzzleCell_Firebase_SignIn_CloudSave.html — updated premium website.
+2. PuzzleCell_firestore.rules — owner-only Firestore access rules.
+
+Firebase setup (one time)
+-------------------------
+1. Open https://console.firebase.google.com/ and create a Firebase project.
+2. In Project settings, add a Web app (</>) and copy its Firebase web configuration.
+3. In the website HTML, find `const firebaseConfig = { ... }` near the top of the first module script. Replace YOUR_FIREBASE_API_KEY, YOUR_PROJECT_ID, and YOUR_FIREBASE_APP_ID with the matching values from your project's web configuration. Keep the values in quotes. Make sure authDomain is your project's actual authDomain. The web config is designed to be public; NEVER place service-account keys or other private server credentials in HTML.
+4. In Build > Authentication > Get started > Sign-in method, enable Email/Password and Google. Save changes. For Google, select a support email if prompted.
+5. In Authentication > Settings, add the website's actual hosting domain to Authorized domains. For local testing, use a local development server rather than opening the file directly as file://. For deployment, use HTTPS hosting and authorize that domain.
+6. In Build > Firestore Database, create a database. Choose a location. Open the Rules tab, replace the rules with the complete contents of PuzzleCell_firestore.rules, and click Publish.
+7. Host the HTML on a static web host over HTTPS, open it, then test account creation, sign-out/sign-in, and Google sign-in. Test that progress restores after reloading and on another device.
+
+How it works
+------------
+- Guest play still works without Firebase, but guest progress is not cloud-synced.
+- When signed in, the game automatically saves the score, current challenge order, challenge index, solved challenges, and used challenge IDs to users/{your-auth-uid}/gameState/progress.
+- The Firestore rules restrict access to that same authenticated user's own document. Do not publish permissive test rules such as allow read, write: if true.
+- This is a single-file static site and uses the Firebase Web SDK from Google's CDN, so an internet connection is required for sign-in/cloud sync.
+
+Troubleshooting
+---------------
+- “unauthorized-domain”: add your exact hosting domain under Authentication > Settings > Authorized domains.
+- Google sign-in popup blocked: allow popups for your site or test from the hosted HTTPS page.
+- “Missing or insufficient permissions”: publish PuzzleCell_firestore.rules to the correct Firestore database.
+- Configured but no cloud sync: confirm projectId, authDomain, appId and apiKey match the same Firebase web app.
