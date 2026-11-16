@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PuzzleCell</title>
+    <link rel="icon" type="image/png" href="./favicon.png">
+    <meta name="google-adsense-account" content="ca-pub-7682618518672159">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#070b12">
+<style>
+:root{
+  --bg:#070b12;
+  --panel:#0d1522;
+  --blue:#4f8cff;
+  --cyan:#55e6ff;
+  --text:#f4f7fb;
+  --muted:#9baabd;
+  --line:rgba(133,170,220,.18);
+  --green:#7fe0bd;
+  --pink:#ff829c;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:#070b12}
+body{
+  margin:0;
+  min-height:100vh;
+  color:var(--text);
+  background:
+    radial-gradient(ellipse at 78% 8%,rgba(34,105,204,.18),transparent 36%),
+    radial-gradient(ellipse at 10% 48%,rgba(28,74,130,.14),transparent 38%),
+    linear-gradient(180deg,#070b12 0%,#080e18 52%,#060a11 100%);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  display:flex;
+  justify-content:center;
+  padding:clamp(12px,3vw,30px);
+  font-size:14px;
+  line-height:1.55;
+  overflow-x:hidden;
+  font-feature-settings:"ss01" on,"cv11" on;
+}
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:-1;
+  opacity:.18;
+  background-image:
+    linear-gradient(rgba(130,165,210,.08) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(130,165,210,.08) 1px,transparent 1px);
+  background-size:54px 54px;
+  mask-image:linear-gradient(to bottom,black,transparent 82%);
+}
+::selection{background:#4f8cff;color:#fff}
+
+.app{width:min(900px,100%)}
+
+/* Header */
+header{text-align:center;padding:38px 10px 30px}
+.eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  color:#7edfff;
+  letter-spacing:2.8px;
+  font-size:.68rem;
+  font-weight:800;
+  text-transform:uppercase;
+  text-shadow:0 0 22px rgba(85,230,255,.22);
+}
+.eyebrow:before,.eyebrow:after{
+  content:"";
+  display:inline-block;
+  width:32px;
+  height:1px;
+  background:linear-gradient(90deg,transparent,#4f8cff 60%,#55e6ff);
+}
+.eyebrow:after{transform:scaleX(-1)}
+
+.logo{
+  font-size:clamp(2.8rem,7.5vw,4.5rem);
+  line-height:1.02;
+  font-weight:850;
+  letter-spacing:-.05em;
+  margin:16px 0 12px;
+  color:#f4f8ff;
+  text-shadow:0 12px 40px rgba(0,0,0,.45);
+}
+.logo span{
+  background:linear-gradient(105deg,#f7fbff 0%,#a8caff 42%,#56e4ff 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  filter:drop-shadow(0 4px 18px rgba(79,140,255,.25));
+}
+.sub{
+  color:#aab8ca;
+  font-size:.95rem;
+  margin:0 auto;
+  max-width:510px;
+  line-height:1.75;
+}
+.portfolio-link{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-top:22px;
+  padding:11px 18px;
+  border:1px solid rgba(135,174,228,.26);
+  border-radius:12px;
+  background:rgba(16,28,45,.72);
+  color:#e8f0fb;
+  font-size:.78rem;
+  font-weight:750;
+  text-decoration:none;
+  box-shadow:inset 0 1px rgba(255,255,255,.05),0 10px 28px rgba(0,0,0,.25);
+  transition:all .22s ease;
+}
+.portfolio-link:hover{
+  border-color:rgba(85,230,255,.65);
+  background:rgba(24,52,82,.85);
+  color:#fff;
+  transform:translateY(-2px);
+  box-shadow:0 12px 30px rgba(16,105,210,.18);
+}
+
+/* Scoreboard */
+.scoreboard{
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  gap:16px;
+  align-items:center;
+  margin:10px 0 22px;
+}
+.score{
+  position:relative;
+  background:linear-gradient(145deg,rgba(17,29,46,.96),rgba(9,16,27,.98));
+  border:1px solid rgba(132,169,218,.18);
+  border-radius:18px;
+  padding:18px 14px;
+  text-align:center;
+  box-shadow:0 18px 44px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.05);
+  transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease;
+}
+.score:hover{
+  transform:translateY(-2px);
+  border-color:rgba(85,191,255,.42);
+  box-shadow:0 22px 50px rgba(0,0,0,.35),0 0 24px rgba(40,127,225,.1);
+}
+.score .name{
+  font-size:.68rem;
+  color:#9baabd;
+  font-weight:800;
+  letter-spacing:1.8px;
+}
+.score .num{
+  font-size:1.95rem;
+  font-weight:850;
+  line-height:1.2;
+  margin-top:5px;
+  letter-spacing:-.5px;
+}
+.you .num{
+  color:#79e4ff;
+  text-shadow:0 0 24px rgba(85,230,255,.28);
+}
+.ai .num{
+  color:#ff829c;
+  text-shadow:0 0 22px rgba(255,130,156,.2);
+}
+.versus{
+  color:#7f91a9;
+  font-size:.72rem;
+  letter-spacing:1.2px;
+  font-weight:900;
+}
+
+/* Main Game Panel & Contact Card */
+.panel,.contact-card{
+  position:relative;
+  background:linear-gradient(145deg,rgba(17,29,46,.97),rgba(9,16,27,.99));
+  border:1px solid rgba(132,169,218,.2);
+  border-radius:22px;
+  padding:clamp(20px,4vw,30px);
+  box-shadow:0 24px 65px rgba(0,0,0,.36),inset 0 1px 0 rgba(255,255,255,.055);
+  transition:border-color .22s ease,box-shadow .22s ease;
+}
+.panel:hover,.contact-card:hover{
+  border-color:rgba(85,191,255,.4);
+  box-shadow:0 28px 72px rgba(0,0,0,.42),0 0 30px rgba(40,127,225,.09);
+}
+.panel:before,.contact-card:before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:6%;
+  right:6%;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(85,230,255,.55),rgba(79,140,255,.35),transparent);
+}
+
+.topline{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  background:rgba(85,230,255,.07);
+  border:1px solid rgba(85,230,255,.32);
+  border-radius:999px;
+  padding:6px 12px;
+  color:#79e4ff;
+  font-size:.7rem;
+  font-weight:800;
+  letter-spacing:.6px;
+}
+.round{color:#9baabd;font-size:.88rem;font-weight:600}
+.challenge-title{
+  font-size:clamp(1.35rem,3.8vw,1.85rem);
+  letter-spacing:-.035em;
+  margin:20px 0 7px;
+  color:#f2f6fc;
+  font-weight:800;
+}
+.instruction{color:#a8b6c9;font-size:.9rem;margin:0 0 16px}
+
+/* Code Box */
+.codebox{
+  position:relative;
+  background:linear-gradient(145deg,#070e18,#0c1828);
+  border:1px solid rgba(130,174,220,.24);
+  border-radius:16px;
+  padding:22px 16px;
+  margin:16px 0;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 14px 32px rgba(0,0,0,.25);
+}
+.code{
+  font:700 clamp(1rem,2.9vw,1.35rem)/1.7 ui-monospace,SFMono-Regular,Consolas,monospace;
+  overflow-wrap:anywhere;
+  letter-spacing:1.2px;
+  color:#80e5ff;
+  text-align:center;
+  text-shadow:0 0 22px rgba(85,230,255,.22);
+}
+.copy{
+  display:block;
+  margin:14px auto 0;
+  background:rgba(16,28,45,.8);
+  border:1px solid rgba(135,174,228,.26);
+  color:#c5d3e5;
+  padding:7px 14px;
+  border-radius:999px;
+  font-size:.76rem;
+  font-weight:700;
+  cursor:pointer;
+  transition:all .2s ease;
+}
+.copy:hover{
+  border-color:#55e6ff;
+  color:#fff;
+  background:rgba(24,52,82,.9);
+}
+
+/* Inputs & Buttons */
+.fieldlabel{
+  display:block;
+  font-size:.82rem;
+  font-weight:750;
+  margin:16px 0 7px;
+  color:#eaf2ff;
+}
+.answer,.contact-form-input,.contact-form-textarea{
+  display:block;
+  width:100%;
+  min-width:0;
+  background:#070e18;
+  color:#f4f7fb;
+  border:1px solid rgba(132,169,218,.24);
+  border-radius:12px;
+  padding:13px 15px;
+  font:inherit;
+  font-size:.9rem;
+  outline:none;
+  box-shadow:inset 0 2px 5px rgba(0,0,0,.25);
+  transition:border-color .2s,box-shadow .2s;
+}
+.answer::placeholder,.contact-form-input::placeholder,.contact-form-textarea::placeholder{
+  color:#6c7d94;
+  opacity:1;
+}
+.answer:focus,.contact-form-input:focus,.contact-form-textarea:focus{
+  border-color:#55e6ff;
+  box-shadow:0 0 0 3px rgba(85,230,255,.14),0 0 22px rgba(79,140,255,.12);
+}
+.answer:disabled{opacity:.6;cursor:not-allowed}
+
+.buttons{display:flex;gap:11px;flex-wrap:wrap;margin-top:15px}
+.btn{
+  border:0;
+  border-radius:11px;
+  padding:12px 17px;
+  font-weight:800;
+  font-size:.82rem;
+  letter-spacing:.2px;
+  cursor:pointer;
+  transition:transform .18s ease,filter .18s ease,box-shadow .18s ease,border-color .18s ease,background .18s ease;
+}
+.btn:hover{transform:translateY(-2px)}
+.btn:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none}
+
+.primary,.contact-submit-button{
+  background:linear-gradient(110deg,#74aaff,#55e6ff);
+  color:#06111e;
+  border:0;
+  box-shadow:0 10px 28px rgba(52,142,255,.22);
+}
+.primary{flex:1}
+.primary:hover,.contact-submit-button:hover{
+  background:linear-gradient(110deg,#a4c7ff,#8cf0ff);
+  color:#06111e;
+  box-shadow:0 12px 32px rgba(85,230,255,.28);
+}
+.secondary{
+  background:rgba(16,28,45,.82);
+  color:#e8f0fb;
+  border:1px solid rgba(135,174,228,.24);
+  box-shadow:inset 0 1px rgba(255,255,255,.05);
+}
+.secondary:hover{
+  border-color:rgba(85,230,255,.65);
+  background:rgba(24,52,82,.88);
+  color:#fff;
+}
+
+.feedback{min-height:24px;margin:14px 0 0;font-size:.88rem;font-weight:750}
+.feedback.good,.contact-status{color:#7fe0bd}
+.feedback.bad{color:#ff829c}
+.hint{color:#9baabd;font-size:.88rem;margin-top:8px}
+
+.footer{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:18px;
+  padding-top:14px;
+  border-top:1px solid rgba(132,169,218,.18);
+  color:#8294aa;
+  font-size:.76rem;
+}
+.footer button{
+  background:none;
+  border:0;
+  color:#79e4ff;
+  font-weight:800;
+  cursor:pointer;
+  transition:color .2s;
+}
+.footer button:hover{color:#fff}
+.toast{text-align:center;color:#7fe0bd;min-height:22px;margin-top:12px;font-size:.84rem;font-weight:600}
+
+/* Contact Section */
+.contact-section{margin-top:26px}
+.contact-card h2{
+  font-size:clamp(1.35rem,3.5vw,1.8rem);
+  line-height:1.2;
+  letter-spacing:-.04em;
+  margin:0 0 8px;
+  color:#f2f6fc;
+  font-weight:800;
+}
+.contact-description{
+  color:#a8b6c9;
+  font-size:.88rem;
+  line-height:1.55;
+  margin:0 0 18px;
+  max-width:560px;
+}
+.contact-form-label{
+  display:block;
+  margin:15px 0 7px;
+  color:#c5d3e5;
+  font:650 .74rem/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;
+  letter-spacing:.7px;
+}
+.contact-form-input{min-height:44px}
+.contact-form-textarea{min-height:104px;resize:vertical;line-height:1.5}
+.contact-submit-button{
+  width:100%;
+  min-height:48px;
+  margin-top:20px;
+  border-radius:12px;
+  font-size:.88rem;
+  font-weight:800;
+  cursor:pointer;
+  transition:transform .18s ease,background .18s ease,box-shadow .18s ease;
+}
+.contact-submit-button:hover{transform:translateY(-2px)}
+
+.contact-button-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:11px;
+  margin-top:14px;
+  padding:11px;
+  border:1px solid rgba(132,169,218,.2);
+  border-radius:18px;
+  background:linear-gradient(145deg,#101d2e,#0a121e);
+  box-shadow:0 16px 40px rgba(0,0,0,.28);
+}
+.contact-shortcut{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  min-height:44px;
+  padding:10px 14px;
+  border-radius:11px;
+  color:#fff;
+  text-decoration:none;
+  text-align:center;
+  font-weight:800;
+  font-size:.82rem;
+  background:#2864c7;
+  box-shadow:0 8px 20px rgba(40,100,199,.2);
+  transition:filter .2s,transform .2s,box-shadow .2s;
+}
+.contact-shortcut:hover{
+  filter:brightness(1.08);
+  transform:translateY(-2px);
+  box-shadow:0 10px 24px rgba(40,100,199,.3);
+}
+.contact-shortcut-whatsapp{
+  background:#087f65;
+  box-shadow:0 8px 20px rgba(8,127,101,.2);
+}
+.contact-shortcut-whatsapp:hover{
+  box-shadow:0 10px 24px rgba(8,127,101,.3);
+}
+.whatsapp-svg{
+  width:18px;
+  height:18px;
+  fill:currentColor;
+  display:inline-block;
+  vertical-align:middle;
+}
+.contact-status{min-height:18px;margin:10px 3px 0;font-size:.78rem;line-height:1.4}
+
+.site-credit{
+  margin-top:22px;
+  padding:18px 8px 8px;
+  text-align:center;
+  border-top:1px solid rgba(132,169,218,.16);
+  color:#7f91a9;
+  font-size:.76rem;
+  line-height:1.8;
+}
+.site-credit strong{color:#dceaff;font-weight:700}
+
+@media(max-width:520px){
+  body{padding:12px}
+  body:before{background-size:38px 38px;opacity:.12}
+  .app{width:100%}
+  header{padding:24px 8px 20px}
+  .scoreboard{gap:10px;margin-bottom:16px}
+  .score{padding:13px 8px;border-radius:15px}
+  .score .num{font-size:1.55rem}
+  .panel,.contact-card{border-radius:18px;padding:20px 15px}
+  .buttons{gap:8px}
+  .buttons .btn{width:100%;min-height:45px}
+  .logo{letter-spacing:-1.8px}
+  .codebox{padding:18px 12px}
+  .footer{font-size:.72rem}
+  .contact-card h2{font-size:1.4rem}
+  .contact-description{font-size:.83rem;margin-bottom:16px}
+  .contact-form-input,.contact-form-textarea{border-radius:11px;padding:11px}
+  .contact-form-textarea{min-height:96px}
+  .contact-submit-button{min-height:45px;border-radius:11px}
+  .contact-button-row{gap:8px;padding:8px;border-radius:14px}
+  .contact-shortcut{min-height:41px;border-radius:10px;font-size:.8rem}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*:before,*:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body><main class="app">
+<header>
+  <div class="eyebrow">DECODE • THINK • WIN</div>
+  <div class="logo">Puzzle<span>Cell</span></div>
+  <p class="sub">Decode. Challenge. Conquer. Crack secret codes, earn points, and become the undisputed Code Boss. 👑</p>
+  <a class="portfolio-link" href="https://imaadvfx.github.io" target="_blank" rel="noopener noreferrer">🌐 Visit ImaadVFX Live Portfolio ↗</a>
+</header>
+
+<section class="scoreboard" aria-label="Scoreboard">
+  <div class="score you"><div class="name">👑 YOU</div><div class="num" id="youScore">0</div></div>
+  <div class="versus">VS</div>
+  <div class="score ai"><div class="name">🤖 AI</div><div class="num" id="aiScore">0</div></div>
+</section>
+
+<section class="panel">
+  <div class="topline">
+    <span class="badge" id="levelBadge">⚡ LEVEL 1 · WARM-UP</span>
+    <span class="round" id="roundText">Challenge 1</span>
+  </div>
+  <h1 class="challenge-title" id="challengeTitle">Decode the message</h1>
+  <p class="instruction" id="instruction">Replace the numbers with the letters they represent.</p>
+  <div class="codebox">
+    <div class="code" id="codeText">Y0U 4R3 7H3 B0$$</div>
+    <button class="copy" id="copyBtn" type="button">Copy code</button>
+  </div>
+  <label class="fieldlabel" for="answerInput">Your decoded answer</label>
+  <input class="answer" id="answerInput" type="text" placeholder="Type your answer here…" autocomplete="off">
+  <div class="buttons">
+    <button class="btn primary" id="checkBtn">CHECK ANSWER ↗</button>
+    <button class="btn secondary" id="hintBtn">💡 Hint</button>
+    <button class="btn secondary" id="revealBtn">Reveal answer</button>
+  </div>
+  <p class="feedback" id="feedback" aria-live="polite"></p>
+  <div class="hint" id="hintText"></div>
+  <div class="footer">
+    <span>🏆 Correct answer = +1 point</span>
+    <button id="resetBtn">Reset game ↺</button>
+  </div>
+</section>
+
+<div class="toast" id="toast"></div>
+
+<section class="contact-section" id="contact">
+  <div class="contact-card">
+    <h2>Send a Quick Message</h2>
+    <p class="contact-description">Fill out the form below to send an instant WhatsApp inquiry.</p>
+    <form id="quickMessageForm">
+      <label class="contact-form-label" for="contactName">YOUR NAME</label>
+      <input class="contact-form-input" id="contactName" name="name" type="text" placeholder="e.g. Rahul Sharma" autocomplete="name" required>
+      <label class="contact-form-label" for="contactContact">YOUR EMAIL OR PHONE</label>
+      <input class="contact-form-input" id="contactContact" name="contact" type="text" placeholder="e.g. name@company.com or +91..." autocomplete="email" required>
+      <label class="contact-form-label" for="contactDetails">PROJECT SCOPE / DETAILS</label>
+      <textarea class="contact-form-textarea" id="contactDetails" name="details" placeholder="Tell me about your business or project ideas..." required></textarea>
+      <button class="contact-submit-button" type="submit">➤ &nbsp; Submit Inquiry</button>
+    </form>
+  </div>
+  <div class="contact-button-row" aria-label="Contact shortcuts">
+    <a class="contact-shortcut contact-shortcut-whatsapp" href="https://wa.me/919997554431" target="_blank" rel="noopener noreferrer">
+      <svg class="whatsapp-svg" viewBox="0 0 448 512"><path fill="currentColor" d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3 18.6-68.1-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/></svg>
+      &nbsp; WhatsApp
+    </a>
+    <a class="contact-shortcut" href="https://wa.me/919997554431?text=Hi%2C%20I%27d%20like%20to%20request%20a%20quote." target="_blank" rel="noopener noreferrer">▦ &nbsp; Quote</a>
+  </div>
+  <p class="contact-status" id="contactStatus" role="status" aria-live="polite"></p>
+</section>
+
+<footer class="site-credit">
+  <div>Founder and Developer: <strong>Mohammad Imaad Danish</strong></div>
+  <div>© <span id="copyrightYear">2027</span> PuzzleCell. All Rights Reserved.</div>
+</footer>
+
+</main>
+<script>
+const phraseBank = ["I AM THE CODE BOSS", "CRACK THE SECRET CODE", "THINK BEFORE YOU ANSWER", "NEVER STOP LEARNING", "YOU CAN SOLVE THIS", "WELCOME TO THE CODE GAME", "PRACTICE MAKES YOU BETTER", "STAY CURIOUS ALWAYS", "THE NEXT CLUE IS HIDDEN", "TRUST YOUR LOGIC", "SMART MINDS WIN", "KEEP YOUR FOCUS", "EVERY PUZZLE HAS A KEY", "FOLLOW THE PATTERN", "LOOK FOR THE CLUE", "YOU ARE GETTING CLOSER", "THE ANSWER IS SIMPLE", "TRY A DIFFERENT WAY", "LEARN FROM EACH MISTAKE", "YOUR BRAIN IS POWERFUL", "DECODING IS FUN", "BE PATIENT AND THINK", "FIND THE MISSING LETTER", "THE SECRET IS IN THE NUMBERS", "WORDS CAN HIDE MEANING", "SOLVE ONE STEP AT A TIME", "YOUR ARE A CHAMPION", "THE GAME STARTS NOW", "READY FOR A CHALLENGE", "THE CODE IS YOURS", "A NEW CLUE APPEARS", "THINK FAST STAY CALM", "LOGIC BEATS GUESSING", "SMALL CLUES MATTER", "THE PATTERN WILL REVEAL ITSELF", "KEEP MOVING FORWARD", "THE BOSS IS BACK", "A CLEVER MIND FINDS A WAY", "SOLVE THE RIDDLE", "THE FINAL CLUE AWAITS", "EVERY SECOND COUNTS", "A GOOD GUESS NEEDS REASON", "THE KEY OPENS THE LOCK", "READ BETWEEN THE LINES", "NUMBERS CAN SPEAK", "LET THE PUZZLE BEGIN", "YOU HAVE THE POWER", "DISCOVER THE HIDDEN MESSAGE", "THE MIND IS YOUR TOOL", "TAKE A CLOSER LOOK", "ONE CLUE CHANGES EVERYTHING", "STAY SHARP", "THE CODE NEVER LIES", "FIND THE RIGHT PATH", "YOUR NEXT WIN IS CLOSE", "BREAK THE CODE", "THE SECRET AGENT RETURNS", "A PUZZLE A DAY", "MAKE EVERY GUESS COUNT", "THINK LIKE A DETECTIVE", "THE ANSWER IS WITHIN REACH", "A NEW LEVEL BEGINS", "USE THE HINT WISELY", "YOUR ARE READY", "THE CHALLENGE IS ON"];
+
+function caesarEncode(text, shift) {
+  return text.replace(/[A-Z]/g, ch => String.fromCharCode((ch.charCodeAt(0)-65+shift)%26+65));
+}
+function atbashEncode(text) {
+  return text.replace(/[A-Z]/g, ch => String.fromCharCode(90 - (ch.charCodeAt(0) - 65)));
+}
+function backwardWordOrder(text) {
+  return text.split(' ').reverse().join(' ');
+}
+function removeVowels(text) {
+  return text.replace(/[AEIOU]/g, '_');
+}
+
+function makeChallengeSet() {
+  const methods = [
+    {name:'Atbash Cipher', instruction:'The alphabet is reversed: A becomes Z, B becomes Y, C becomes X, etc.', encode:atbashEncode, hint:'A=Z, B=Y, C=X, and so on.'},
+    {name:'Backward Words', instruction:'The order of the words in the sentence has been reversed.', encode:backwardWordOrder, hint:'Read the words starting from the last word back to the first.'},
+    {name:'Missing Vowels', instruction:'All vowels (A, E, I, O, U) are replaced with underscores (_). Fill them in.', encode:removeVowels, hint:'Replace the underscores with the missing vowels.'},
+    {name:'Shift Cipher (+5)', instruction:'Each letter has been shifted 5 places forward in the alphabet.', encode:text=>caesarEncode(text,5), hint:'A becomes F, B becomes G, and so on.'}
+  ];
+  const all = [];
+  phraseBank.forEach((answer, phraseIndex) => {
+    methods.forEach((method, methodIndex) => {
+      all.push({
+        id: phraseIndex + '-' + methodIndex,
+        title: method.name + ': Challenge ' + (phraseIndex + 1),
+        level: ['WARM-UP','EASY','MEDIUM','HARD'][methodIndex],
+        instruction: method.instruction,
+        code: method.encode(answer),
+        answer,
+        hint: method.hint
+      });
+    });
+  });
+  return all;
+}
+
+function shuffle(items) {
+  const result = items.slice();
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+function loadUsedChallengeIds() {
+  try { return new Set(JSON.parse(localStorage.getItem('puzzlecell_used_challenges') || '[]')); }
+  catch (e) { return new Set(); }
+}
+function saveUsedChallengeIds(ids) {
+  try { localStorage.setItem('puzzlecell_used_challenges', JSON.stringify([...ids])); }
+  catch (e) {}
+}
+const challengePool = makeChallengeSet();
+let usedChallengeIds = loadUsedChallengeIds();
+function getFreshChallenges() {
+  let fresh = challengePool.filter(challenge => !usedChallengeIds.has(challenge.id));
+  if (fresh.length < 130) {
+    usedChallengeIds = new Set();
+    fresh = challengePool.slice();
+  }
+  const batch = shuffle(fresh).slice(0, 130);
+  batch.forEach(challenge => usedChallengeIds.add(challenge.id));
+  saveUsedChallengeIds(usedChallengeIds);
+  return batch;
+}
+let challenges = getFreshChallenges();
+
+let index=0,you=0,ai=0,solved=new Set(),hintUsed=false;
+const $=id=>document.getElementById(id);
+function render(){
+  const c=challenges[index];
+  $('levelBadge').textContent='⚡ LEVEL '+(index+1)+' · '+c.level;
+  $('roundText').textContent='Challenge '+(index+1)+' of 130';
+  $('challengeTitle').textContent=c.title;
+  $('instruction').textContent=c.instruction;
+  $('codeText').textContent=c.code;
+  $('answerInput').value='';
+  $('answerInput').disabled=false;
+  $('feedback').textContent='';
+  $('feedback').className='feedback';
+  $('hintText').textContent='';
+  $('checkBtn').disabled=false;
+  $('checkBtn').textContent='CHECK ANSWER ↗';
+  $('hintBtn').disabled=false;
+  $('revealBtn').disabled=false;
+  $('youScore').textContent=you;
+  $('aiScore').textContent=ai;
+  hintUsed=false;
+  $('nextBtn')?.remove();
+}
+function normalize(s){return s.toUpperCase().replace(/0/g,'O').replace(/1/g,'I').replace(/4/g,'A').replace(/3/g,'E').replace(/7/g,'T').replace(/5/g,'S').replace(/8/g,'B').replace(/\$/g,'S').replace(/[^A-Z]/g,'')}
+function check(){
+  if($('checkBtn').disabled) return;
+  const value=$('answerInput').value;
+  if(!value.trim()){
+    $('feedback').textContent='Type your answer first, Code Boss!';
+    $('feedback').className='feedback bad';
+    return;
+  }
+  
+  $('answerInput').disabled = true;
+  $('checkBtn').disabled = true;
+  $('hintBtn').disabled = true;
+  $('revealBtn').disabled = true;
+
+  if(normalize(value)===normalize(challenges[index].answer)) {
+    you++;
+    solved.add(index);
+    $('youScore').textContent=you;
+    $('feedback').textContent='Correct! You cracked the code. 👑 +1 point!';
+    $('feedback').className='feedback good';
+    $('checkBtn').textContent='SOLVED ✓';
+    $('toast').textContent=you===challenges.length?'🏆 YOU ARE THE SECRET CODE CHAMPION!':'Great job! Move to the next challenge when ready.';
+  } else {
+    ai++;
+    $('aiScore').textContent=ai;
+    $('feedback').textContent='Not quite! The answer was: ' + challenges[index].answer + '. The AI gets +1 point. 🤖';
+    $('feedback').className='feedback bad';
+  }
+
+  if(index<challenges.length-1){
+    $('nextBtn')?.remove();
+    const b=document.createElement('button');
+    b.className='btn secondary'; b.id='nextBtn'; b.textContent='NEXT CHALLENGE →'; b.onclick=next;
+    $('checkBtn').parentElement.appendChild(b);
+  } else {
+    $('toast').textContent='🏆 YOU ARE THE SECRET CODE CHAMPION!';
+  }
+}
+function next(){if(index<challenges.length-1)index++;else index=0;$('nextBtn')?.remove();$('toast').textContent='';render()}
+$('checkBtn').onclick=check;$('answerInput').addEventListener('keydown',e=>{if(e.key==='Enter')check()});$('hintBtn').onclick=()=>{$('hintText').textContent='💡 Hint: '+challenges[index].hint;hintUsed=true};$('revealBtn').onclick=()=>{$('feedback').textContent='Answer: '+challenges[index].answer;$('feedback').className='feedback';$('hintText').textContent='Try the next one without revealing it!'};
+$('copyBtn').onclick=async()=>{
+  try{
+    if(!navigator.clipboard || !navigator.clipboard.writeText){
+      throw new Error('Clipboard API unavailable');
+    }
+    await navigator.clipboard.writeText(challenges[index].code);
+    $('copyBtn').textContent='Copied! ✓';
+  }catch(e){
+    $('copyBtn').textContent='Select code to copy';
+  }
+  setTimeout(()=>$('copyBtn').textContent='Copy code',1200);
+};
+$('resetBtn').onclick=()=>{
+  you=0; ai=0; index=0; solved.clear();
+  $('nextBtn')?.remove();
+  challenges=getFreshChallenges();
+  $('toast').textContent='Fresh set loaded: 130 new challenges. Ready for a new battle!';
+  render();
+};
+render();
+</script>
+
+<script>
+(function () {
+  const form = document.getElementById('quickMessageForm');
+  if (!form) return;
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    const name = document.getElementById('contactName').value.trim();
+    const contact = document.getElementById('contactContact').value.trim();
+    const details = document.getElementById('contactDetails').value.trim();
+    const status = document.getElementById('contactStatus');
+    if (!name || !contact || !details) {
+      status.textContent = 'Please complete all fields before submitting.';
+      return;
+    }
+    const message = 'Name: ' + name + '\nE-Mail/Phone No.: ' + contact + '\nDescription: ' + details;
+    const url = 'https://wa.me/919997554431?text=' + encodeURIComponent(message);
+    window.open(url, '_blank');
+    status.textContent = 'WhatsApp is opening with your inquiry ready to send.';
+  });
+  const year = document.getElementById('copyrightYear');
+  if (year) year.textContent = '2027';
+})();
+</script>
+
+</body>
+</html>
